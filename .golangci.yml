@@ -1,0 +1,7 @@
+linters:
+  enable-all: true
+  disable:
+    - gofmt
+
+issues:
+  exclude-use-default: false
