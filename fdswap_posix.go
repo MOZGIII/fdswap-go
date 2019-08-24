@@ -5,9 +5,12 @@ import (
 	"syscall"
 )
 
+// FD represents a file descriptor.
+type FD = int
+
 // SwapFds swaps the underlying target of `fdToReplace` with the one from
 // `fdToReplaceWith`.
-func SwapFds(fdToReplace, fdToReplaceWith int) (*SwappedFdHandle, error) {
+func SwapFds(fdToReplace, fdToReplaceWith FD) (*SwappedFdHandle, error) {
 	// Dup the original Fd to be able to restore it.
 	origFdCopy, err := syscall.Dup(fdToReplace)
 	if err != nil {
@@ -29,13 +32,13 @@ func SwapFds(fdToReplace, fdToReplaceWith int) (*SwappedFdHandle, error) {
 // SwapFiles swaps the underlying target of `fileToReplace` with the one from
 // `fileToReplaceWith`.
 func SwapFiles(fileToReplace, fileToReplaceWith *os.File) (*SwappedFdHandle, error) {
-	return SwapFds(int(fileToReplace.Fd()), int(fileToReplaceWith.Fd()))
+	return SwapFds(FD(fileToReplace.Fd()), FD(fileToReplaceWith.Fd()))
 }
 
 // SwappedFdHandle allows restoring swapped fd with original.
 type SwappedFdHandle struct {
-	fd             int
-	originalFdCopy int
+	fd             FD
+	originalFdCopy FD
 }
 
 var _ Restorer = (*SwappedFdHandle)(nil)
@@ -56,13 +59,13 @@ func (h *SwappedFdHandle) Restore() error {
 }
 
 // Fd returns Fd that was swapped.
-func (h *SwappedFdHandle) Fd() int {
+func (h *SwappedFdHandle) Fd() FD {
 	return h.fd
 }
 
 // OriginalFdCopy returns a Fd that is different from the original Fd, but has
 // the same underlying target.
 // Can be used to restore the Fd we swapped to it's original target.
-func (h *SwappedFdHandle) OriginalFdCopy() int {
+func (h *SwappedFdHandle) OriginalFdCopy() FD {
 	return h.originalFdCopy
 }
