@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/MOZGIII/fdswap"
+	"github.com/MOZGIII/fdswap-go"
 )
 
 func TestFdswap(t *testing.T) {
