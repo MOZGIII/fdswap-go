@@ -13,6 +13,9 @@ type FD = int
 // SwapFds swaps the underlying target of `fdToReplace` with the one from
 // `fdToReplaceWith`.
 func SwapFds(fdToReplace, fdToReplaceWith FD) (*SwappedFdHandle, error) {
+	syscall.ForkLock.RLock()
+	defer syscall.ForkLock.RUnlock()
+
 	// Dup the original Fd to be able to restore it.
 	origFdCopy, err := syscall.Dup(fdToReplace)
 	if err != nil {
@@ -47,6 +50,9 @@ var _ Restorer = (*SwappedFdHandle)(nil)
 
 // Restore underlying target of the fd to the original.
 func (h *SwappedFdHandle) Restore() error {
+	syscall.ForkLock.RLock()
+	defer syscall.ForkLock.RUnlock()
+
 	// Set the replaced fd back to it's original value.
 	err := syscall.Dup2(h.originalFdCopy, h.fd)
 
