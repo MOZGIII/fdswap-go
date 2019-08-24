@@ -38,6 +38,8 @@ type SwappedFdHandle struct {
 	originalFdCopy int
 }
 
+var _ Restorer = (*SwappedFdHandle)(nil)
+
 // Restore underlying target of the fd to the original.
 func (h *SwappedFdHandle) Restore() error {
 	// Set the replaced fd back to it's original value.
