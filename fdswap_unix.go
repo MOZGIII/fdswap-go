@@ -21,6 +21,7 @@ func SwapFds(fdToReplace, fdToReplaceWith FD) (*SwappedFdHandle, error) {
 	if err != nil {
 		return nil, err
 	}
+	syscall.CloseOnExec(origFdCopy)
 
 	// Swap original fd with a new one.
 	if err := syscall.Dup2(fdToReplaceWith, fdToReplace); err != nil {
